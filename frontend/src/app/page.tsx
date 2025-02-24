@@ -1,157 +1,164 @@
-import React from 'react';
-import Link from 'next/link';
-import { ArrowRight, Bot, Sparkles, Shield, Zap, Code } from 'lucide-react';
+'use client';
 
-const features = [
-  {
-    icon: Bot,
-    title: 'AI Agent Creation',
-    description: 'Build custom AI agents with our intuitive wizard interface',
-  },
-  {
-    icon: Sparkles,
-    title: 'Smart Prompts',
-    description: 'Craft and optimize prompts with real-time AI feedback',
-  },
-  {
-    icon: Shield,
-    title: 'Enterprise Security',
-    description: 'Bank-grade security with role-based access control',
-  },
-  {
-    icon: Code,
-    title: 'API Integration',
-    description: 'Seamlessly integrate AI agents into your applications',
-  },
-  {
-    icon: Zap,
-    title: 'Real-time Processing',
-    description: 'Lightning-fast responses with optimized performance',
-  },
-];
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowRight, Bot, Shield, Zap, Code, Sparkles } from 'lucide-react';
 
 export default function LandingPage() {
+  const router = useRouter();
+  const [isHovered, setIsHovered] = useState(false);
+
+  const features = [
+    {
+      icon: <Bot className="h-6 w-6" />,
+      title: 'AI Agent Creation',
+      description: 'Build custom AI agents with our intuitive wizard interface',
+    },
+    {
+      icon: <Sparkles className="h-6 w-6" />,
+      title: 'Smart Prompts',
+      description: 'Craft and optimize prompts with real-time AI feedback',
+    },
+    {
+      icon: <Shield className="h-6 w-6" />,
+      title: 'Enterprise Security',
+      description: 'Bank-grade security with role-based access control',
+    },
+    {
+      icon: <Code className="h-6 w-6" />,
+      title: 'API Integration',
+      description: 'Seamlessly integrate AI agents into your applications',
+    },
+  ];
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <header className="relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-background" />
-        <div className="container relative mx-auto flex min-h-screen items-center px-4">
-          <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
-            <div className="flex flex-col justify-center space-y-8">
-              <div className="space-y-4">
-                <h1 className="text-5xl font-bold tracking-tight lg:text-7xl">
-                  Create Powerful{' '}
-                  <span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
-                    AI Agents
-                  </span>
-                </h1>
-                <p className="text-xl text-muted-foreground">
-                  Build, deploy, and manage intelligent AI agents that transform your business operations.
-                </p>
-              </div>
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <Link
-                  href="/auth/signup"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90"
+      <section className="relative overflow-hidden bg-gradient-to-b from-primary/10 to-background pb-16 pt-24">
+        <div className="container relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mx-auto max-w-3xl text-center"
+          >
+            <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-6xl">
+              Create Powerful{' '}
+              <span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
+                AI Agents
+              </span>
+            </h1>
+            <p className="mb-8 text-xl text-muted-foreground">
+              Build, deploy, and manage intelligent AI agents that transform your business operations.
+              Get started in minutes with our intuitive platform.
+            </p>
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button
+                size="lg"
+                className="group"
+                onClick={() => router.push('/signup')}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                Get Started
+                <motion.span
+                  animate={{ x: isHovered ? 5 : 0 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  Get Started
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="/auth/login"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border px-6 py-3 font-medium hover:bg-accent"
-                >
-                  Sign In
-                </Link>
-              </div>
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </motion.span>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => router.push('/signin')}
+              >
+                Sign In
+              </Button>
             </div>
-            <div className="hidden lg:block">
-              {/* Add hero illustration or animation here */}
-              <div className="relative h-full w-full rounded-lg bg-gradient-to-br from-primary/20 to-background p-8">
-                <div className="absolute inset-0 bg-grid-white/10" />
-                {/* Placeholder for interactive demo or animation */}
-                <div className="relative rounded-lg border bg-card/50 p-4 backdrop-blur">
-                  <code className="text-sm text-muted-foreground">
-                    {`// Example AI Agent Configuration
+          </motion.div>
+
+          {/* Code Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mx-auto mt-12 max-w-3xl overflow-hidden rounded-lg border bg-card/50 backdrop-blur"
+          >
+            <pre className="overflow-x-auto p-6">
+              <code className="text-sm text-foreground/80">
+                {`// Example AI Agent Configuration
 {
   "name": "Customer Support Bot",
   "model": "GPT-4",
   "personality": "Professional",
-  "capabilities": ["Chat", "Email", "Knowledge Base"]
+  "capabilities": [
+    "Chat",
+    "Email",
+    "Knowledge Base"
+  ]
 }`}
-                  </code>
-                </div>
-              </div>
-            </div>
-          </div>
+              </code>
+            </pre>
+          </motion.div>
         </div>
-      </header>
+
+        {/* Background Elements */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute -top-1/2 right-0 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute -bottom-1/2 left-0 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
+        </div>
+      </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-24">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold">Powerful Features</h2>
-          <p className="mt-4 text-xl text-muted-foreground">
-            Everything you need to create and manage AI agents
-          </p>
-        </div>
-        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <div
+      <section className="py-24">
+        <div className="container">
+          <h2 className="mb-12 text-center text-3xl font-bold">Powerful Features</h2>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {features.map((feature, index) => (
+              <motion.div
                 key={feature.title}
-                className="group rounded-xl border bg-card p-6 transition-all hover:shadow-lg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3 text-primary group-hover:bg-primary group-hover:text-primary-foreground">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h3 className="mb-2 text-xl font-semibold">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </div>
-            );
-          })}
+                <Card className="h-full transition-transform hover:scale-105">
+                  <CardContent className="flex flex-col items-center p-6 text-center">
+                    <div className="mb-4 rounded-full bg-primary/10 p-3 text-primary">
+                      {feature.icon}
+                    </div>
+                    <h3 className="mb-2 font-semibold">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="border-t bg-accent/50">
-        <div className="container mx-auto px-4 py-24">
-          <div className="flex flex-col items-center text-center">
-            <h2 className="text-3xl font-bold">Ready to get started?</h2>
-            <p className="mt-4 text-xl text-muted-foreground">
-              Create your first AI agent in minutes
-            </p>
-            <Link
-              href="/auth/signup"
-              className="mt-8 inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90"
-            >
-              Start Building
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+      <section className="bg-primary/5 py-24">
+        <div className="container text-center">
+          <h2 className="mb-4 text-3xl font-bold">Ready to Get Started?</h2>
+          <p className="mb-8 text-muted-foreground">
+            Create your first AI agent in minutes. No credit card required.
+          </p>
+          <Button
+            size="lg"
+            onClick={() => router.push('/signup')}
+            className="group"
+          >
+            Create Your First Agent
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Button>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="border-t">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              © 2024 AI Agent Generator. All rights reserved.
-            </p>
-            <div className="flex gap-4">
-              <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">
-                Terms of Service
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 } 

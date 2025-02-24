@@ -1,37 +1,42 @@
 import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'default' | 'primary' | 'secondary';
   className?: string;
 }
 
+const sizeClasses = {
+  sm: 'h-4 w-4',
+  md: 'h-6 w-6',
+  lg: 'h-8 w-8',
+};
+
+const variantClasses = {
+  default: 'text-muted-foreground',
+  primary: 'text-primary',
+  secondary: 'text-secondary',
+};
+
 export function LoadingSpinner({
   size = 'md',
-  variant = 'primary',
-  className = '',
+  variant = 'default',
+  className,
 }: LoadingSpinnerProps) {
-  const sizeClasses = {
-    sm: 'h-4 w-4 border-2',
-    md: 'h-8 w-8 border-3',
-    lg: 'h-12 w-12 border-4',
-  };
-
-  const variantClasses = {
-    primary: 'border-primary border-t-transparent',
-    secondary: 'border-secondary border-t-transparent',
-    ghost: 'border-muted-foreground border-t-transparent',
-  };
-
   return (
-    <div className={cn('flex items-center justify-center', className)}>
-      <div
+    <div
+      role="status"
+      className={cn('flex items-center justify-center', className)}
+    >
+      <Loader2
         className={cn(
-          'animate-spin rounded-full',
+          'animate-spin',
           sizeClasses[size],
           variantClasses[variant]
         )}
       />
+      <span className="sr-only">Loading...</span>
     </div>
   );
 } 

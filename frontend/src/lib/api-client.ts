@@ -1,6 +1,14 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { 
+  AxiosError, 
+  InternalAxiosRequestConfig,
+  AxiosResponse 
+} from 'axios';
 import { auth } from './firebase';
 import toast from 'react-hot-toast';
+
+interface ApiErrorResponse {
+  message: string;
+}
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -12,13 +20,11 @@ const apiClient = axios.create({
 
 // Request interceptor
 apiClient.interceptors.request.use(
-  async (config: AxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
     const user = auth.currentUser;
     if (user) {
       const token = await user.getIdToken();
-      if (config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -30,7 +36,7 @@ apiClient.interceptors.request.use(
 // Response interceptor
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
-  (error: AxiosError) => {
+  (error: AxiosError<ApiErrorResponse>) => {
     const message = error.response?.data?.message || 'An error occurred';
     
     switch (error.response?.status) {

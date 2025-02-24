@@ -14,6 +14,8 @@ import {
   sendEmailVerification,
   EmailAuthProvider,
   reauthenticateWithCredential,
+  GithubAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
@@ -31,6 +33,7 @@ interface AuthContextType {
   verifyEmail: () => Promise<void>;
   reauthenticate: (password: string) => Promise<void>;
   isEmailVerified: boolean;
+  signInWithGithub: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -101,6 +104,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await reauthenticateWithCredential(auth.currentUser, credential);
   };
 
+  const signInWithGithub = async () => {
+    const provider = new GithubAuthProvider();
+    await signInWithPopup(auth, provider);
+  };
+
   const value = {
     user,
     loading,
@@ -114,6 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     verifyEmail,
     reauthenticate,
     isEmailVerified: user?.emailVerified ?? false,
+    signInWithGithub,
   };
 
   return (
