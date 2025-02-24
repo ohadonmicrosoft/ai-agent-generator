@@ -4,6 +4,8 @@ const nextConfig = {
   images: {
     unoptimized: true, // Required for static export
   },
+  // Ensure trailing slashes for Firebase hosting
+  trailingSlash: true,
   // Other config options...
 }
 
