@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,8 +14,19 @@ import {
   X,
   LogOut,
   ChevronRight,
+  Search,
+  Bell,
+  Command,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface NavItem {
   label: string;
@@ -35,6 +46,21 @@ export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user, logout } = useAuth();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: 'New Agent Created',
+      message: 'Your AI agent "Customer Support" is ready.',
+      time: '5m ago',
+    },
+    {
+      id: 2,
+      title: 'Prompt Updated',
+      message: 'Changes to "Sales Bot" prompt were saved.',
+      time: '1h ago',
+    },
+  ]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -53,6 +79,18 @@ export function Navigation() {
     handleResize();
 
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleLogout = async () => {
@@ -112,6 +150,56 @@ export function Navigation() {
           >
             AI Agent Generator
           </motion.span>
+        </div>
+
+        {/* Top Actions */}
+        <div className="flex items-center justify-end gap-2 px-4 py-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center gap-2"
+            onClick={() => setIsSearchOpen(true)}
+          >
+            <Search className="h-4 w-4" />
+            <span className="hidden md:inline">Search</span>
+            <kbd className="hidden rounded bg-muted px-2 py-0.5 text-xs md:inline">
+              ⌘K
+            </kbd>
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="relative">
+                <Bell className="h-4 w-4" />
+                {notifications.length > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                    {notifications.length}
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+              {notifications.map((notification) => (
+                <DropdownMenuItem
+                  key={notification.id}
+                  className="flex flex-col items-start gap-1 p-4"
+                >
+                  <div className="font-medium">{notification.title}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {notification.message}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {notification.time}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+              {notifications.length === 0 && (
+                <div className="p-4 text-center text-sm text-muted-foreground">
+                  No new notifications
+                </div>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Navigation Items */}
@@ -195,6 +283,25 @@ export function Navigation() {
           </Button>
         </div>
       </motion.nav>
+
+      {/* Search Dialog */}
+      <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+        <DialogContent className="max-w-2xl">
+          <div className="flex items-center gap-2 border-b pb-4">
+            <Search className="h-5 w-5 text-muted-foreground" />
+            <Input
+              placeholder="Search agents, prompts, or settings..."
+              className="border-0 focus-visible:ring-0"
+              autoFocus
+            />
+            <kbd className="rounded bg-muted px-2 py-1 text-xs">ESC</kbd>
+          </div>
+          <div className="mt-4">
+            <h4 className="mb-2 text-sm font-medium">Recent Searches</h4>
+            {/* Add recent searches here */}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (

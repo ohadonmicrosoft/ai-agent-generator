@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { ProtectedRoute } from '@/components/auth/protected-route';
+import { Badge } from '@/components/ui/badge';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bot,
   Plus,
@@ -16,6 +18,9 @@ import {
   ArrowUpDown,
   ChevronLeft,
   ChevronRight,
+  MessageSquare,
+  Clock,
+  Settings,
 } from 'lucide-react';
 
 interface Agent {
@@ -38,7 +43,7 @@ interface FilterConfig {
   model: string[];
 }
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 8;
 
 // Sample data - replace with API call
 const sampleAgents: Agent[] = Array.from({ length: 50 }, (_, i) => ({
@@ -50,6 +55,19 @@ const sampleAgents: Agent[] = Array.from({ length: 50 }, (_, i) => ({
   lastActive: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
   totalInteractions: Math.floor(Math.random() * 10000),
 }));
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'active':
+      return 'bg-green-500/10 text-green-500 hover:bg-green-500/20';
+    case 'inactive':
+      return 'bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20';
+    case 'error':
+      return 'bg-red-500/10 text-red-500 hover:bg-red-500/20';
+    default:
+      return 'bg-gray-500/10 text-gray-500 hover:bg-gray-500/20';
+  }
+};
 
 export default function Agents() {
   const router = useRouter();
@@ -168,162 +186,150 @@ export default function Agents() {
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
+                className={showFilters ? 'bg-secondary' : ''}
               >
                 <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Filters
+                Filters {showFilters ? '(Active)' : ''}
               </Button>
             </div>
 
-            {showFilters && (
-              <div className="mt-4 space-y-4">
-                <div>
-                  <h3 className="mb-2 font-medium">Status</h3>
-                  <div className="flex gap-2">
-                    {['active', 'inactive', 'error'].map((status) => (
-                      <Button
-                        key={status}
-                        variant={filters.status.includes(status) ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => toggleFilter('status', status)}
-                      >
-                        {status}
-                      </Button>
-                    ))}
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <h3 className="mb-2 font-medium">Status</h3>
+                      <div className="flex gap-2">
+                        {['active', 'inactive', 'error'].map((status) => (
+                          <Button
+                            key={status}
+                            variant={filters.status.includes(status) ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => toggleFilter('status', status)}
+                            className={filters.status.includes(status) ? getStatusColor(status) : ''}
+                          >
+                            {status}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="mb-2 font-medium">Model</h3>
+                      <div className="flex gap-2">
+                        {['gpt-4', 'gpt-3.5-turbo'].map((model) => (
+                          <Button
+                            key={model}
+                            variant={filters.model.includes(model) ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => toggleFilter('model', model)}
+                          >
+                            {model}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <h3 className="mb-2 font-medium">Model</h3>
-                  <div className="flex gap-2">
-                    {['gpt-4', 'gpt-3.5-turbo'].map((model) => (
-                      <Button
-                        key={model}
-                        variant={filters.model.includes(model) ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => toggleFilter('model', model)}
-                      >
-                        {model}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Agents</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="grid grid-cols-[1fr,1fr,auto,auto,auto] gap-4 border-b pb-2 font-medium">
-                <button
-                  className="flex items-center gap-1"
-                  onClick={() => handleSort('name')}
-                >
-                  Name
-                  <ArrowUpDown className="h-4 w-4" />
-                </button>
-                <button
-                  className="flex items-center gap-1"
-                  onClick={() => handleSort('model')}
-                >
-                  Model
-                  <ArrowUpDown className="h-4 w-4" />
-                </button>
-                <button
-                  className="flex items-center gap-1"
-                  onClick={() => handleSort('status')}
-                >
-                  Status
-                  <ArrowUpDown className="h-4 w-4" />
-                </button>
-                <button
-                  className="flex items-center gap-1"
-                  onClick={() => handleSort('lastActive')}
-                >
-                  Last Active
-                  <ArrowUpDown className="h-4 w-4" />
-                </button>
-                <button
-                  className="flex items-center gap-1"
-                  onClick={() => handleSort('totalInteractions')}
-                >
-                  Total Interactions
-                  <ArrowUpDown className="h-4 w-4" />
-                </button>
-              </div>
-
-              {paginatedAgents.map((agent) => (
-                <div
-                  key={agent.id}
-                  className="grid grid-cols-[1fr,1fr,auto,auto,auto] gap-4 rounded-lg border p-4 transition-colors hover:bg-accent"
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <AnimatePresence mode="popLayout">
+            {paginatedAgents.map((agent, index) => (
+              <motion.div
+                key={agent.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2, delay: index * 0.05 }}
+              >
+                <Card 
+                  className="h-full cursor-pointer transition-all hover:shadow-lg"
                   onClick={() => router.push(`/agents/${agent.id}`)}
-                  role="button"
-                  tabIndex={0}
                 >
-                  <div className="flex items-center gap-2">
-                    <Bot className="h-4 w-4" />
-                    <span>{agent.name}</span>
-                  </div>
-                  <div>{agent.model}</div>
-                  <div>
-                    <span
-                      className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                        agent.status === 'active'
-                          ? 'bg-green-100 text-green-700'
-                          : agent.status === 'inactive'
-                          ? 'bg-gray-100 text-gray-700'
-                          : 'bg-red-100 text-red-700'
-                      }`}
-                    >
-                      {agent.status}
-                    </span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {new Date(agent.lastActive).toLocaleDateString()}
-                  </div>
-                  <div className="text-right">{agent.totalInteractions.toLocaleString()}</div>
-                </div>
-              ))}
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1.5">
+                        <CardTitle className="flex items-center gap-2">
+                          <Bot className="h-5 w-5" />
+                          {agent.name}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          {agent.description}
+                        </p>
+                      </div>
+                      <Badge className={getStatusColor(agent.status)}>
+                        {agent.status}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="flex items-center gap-1 text-muted-foreground">
+                          <MessageSquare className="h-4 w-4" />
+                          {agent.totalInteractions.toLocaleString()} interactions
+                        </span>
+                        <Badge variant="outline">{agent.model}</Badge>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        Last active: {new Date(agent.lastActive).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
 
-              {paginatedAgents.length === 0 && (
-                <div className="py-8 text-center text-muted-foreground">
-                  No agents found matching your criteria
-                </div>
-              )}
-
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between border-t pt-4">
-                  <div className="text-sm text-muted-foreground">
-                    Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{' '}
-                    {Math.min(currentPage * ITEMS_PER_PAGE, filteredAgents.length)} of{' '}
-                    {filteredAgents.length} agents
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
+        {filteredAgents.length > ITEMS_PER_PAGE && (
+          <div className="mt-8 flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filteredAgents.length)} of {filteredAgents.length} agents
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className={currentPage === page ? 'bg-primary text-primary-foreground' : ''}
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </ProtectedRoute>
   );
