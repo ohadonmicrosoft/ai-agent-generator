@@ -1,20 +1,22 @@
-import { initializeApp } from 'firebase/app';
+'use client';
+
+import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD-FKOVrc22alATy1LzgouWG6KLW2V2YWs",
-  authDomain: "ai-agent-generator-a05b0.firebaseapp.com",
-  projectId: "ai-agent-generator-a05b0",
-  storageBucket: "ai-agent-generator-a05b0.firebasestorage.app",
-  messagingSenderId: "408498574443",
-  appId: "1:408498574443:web:4017ca6bb7f13c900bcd2e",
-  measurementId: "G-BLGHNQCDX7"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase only if it hasn't been initialized
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 // Initialize Firebase Authentication
 export const auth = getAuth(app);
@@ -22,9 +24,10 @@ export const auth = getAuth(app);
 // Initialize Firebase Storage
 export const storage = getStorage(app);
 
-// Initialize Analytics conditionally (only in browser)
-export const analytics = typeof window !== 'undefined' 
-  ? isSupported().then(yes => yes ? getAnalytics(app) : null) 
-  : null;
+// Initialize Analytics only in production and in browser
+export const analytics = 
+  typeof window !== 'undefined' && process.env.NODE_ENV === 'production'
+    ? isSupported().then(yes => yes ? getAnalytics(app) : null)
+    : null;
 
 export default app; 
