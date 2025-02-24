@@ -1,154 +1,142 @@
-import React from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+'use client';
 
-const steps = [
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+interface FormField {
+  label: string;
+  type: string;
+  placeholder?: string;
+  required: boolean;
+  options?: string[];
+  min?: number;
+  max?: number;
+  step?: number;
+  defaultValue?: string | number;
+}
+
+const formFields: FormField[] = [
   {
-    id: 'basic-info',
-    name: 'Basic Information',
-    fields: [
-      {
-        label: 'Agent Name',
-        type: 'text',
-        placeholder: 'e.g., Customer Support Assistant',
-        required: true,
-      },
-      {
-        label: 'Description',
-        type: 'textarea',
-        placeholder: 'Describe what your agent does...',
-        required: true,
-      },
-    ],
+    label: 'Agent Name',
+    type: 'text',
+    placeholder: 'Enter agent name',
+    required: true,
   },
   {
-    id: 'behavior',
-    name: 'Agent Behavior',
-    fields: [
-      {
-        label: 'Personality',
-        type: 'select',
-        options: ['Professional', 'Friendly', 'Technical', 'Casual'],
-        required: true,
-      },
-      {
-        label: 'Response Style',
-        type: 'select',
-        options: ['Concise', 'Detailed', 'Conversational'],
-        required: true,
-      },
-    ],
+    label: 'Description',
+    type: 'textarea',
+    placeholder: 'Describe your agent',
+    required: true,
   },
   {
-    id: 'model-config',
-    name: 'Model Configuration',
-    fields: [
-      {
-        label: 'AI Model',
-        type: 'select',
-        options: ['GPT-4', 'GPT-3.5', 'Claude-2', 'Custom'],
-        required: true,
-      },
-      {
-        label: 'Temperature',
-        type: 'range',
-        min: 0,
-        max: 1,
-        step: 0.1,
-        defaultValue: 0.7,
-        required: true,
-      },
-    ],
+    label: 'Model',
+    type: 'select',
+    options: ['gpt-4', 'gpt-3.5-turbo'],
+    required: true,
+  },
+  {
+    label: 'Temperature',
+    type: 'number',
+    min: 0,
+    max: 2,
+    step: 0.1,
+    defaultValue: 0.7,
+    required: true,
   },
 ];
 
-export default function CreateAgentPage() {
+export default function CreateAgent() {
+  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // TODO: Implement agent creation logic
+      console.log('Form data:', formData);
+      router.push('/agents');
+    } catch (error) {
+      console.error('Error creating agent:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
   return (
-    <div className="mx-auto max-w-3xl">
-      <div className="mb-8">
-        <Link
-          href="/agents"
-          className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Agents
-        </Link>
-        <h1 className="text-4xl font-bold">Create New Agent</h1>
-        <p className="text-xl text-muted-foreground">
-          Configure your AI agent in a few simple steps
-        </p>
-      </div>
-
-      {/* Progress Steps */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          {steps.map((step, index) => (
-            <div key={step.id} className="flex items-center">
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full border-2 font-semibold ${
-                  index === 0
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-muted text-muted-foreground'
-                }`}
-              >
-                {index + 1}
+    <div className="container mx-auto px-4 py-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Create New Agent</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {formFields.map((field) => (
+              <div key={field.label} className="space-y-2">
+                <label className="text-sm font-medium">
+                  {field.label}
+                  {field.required && <span className="text-red-500">*</span>}
+                </label>
+                {field.type === 'textarea' ? (
+                  <textarea
+                    className="w-full rounded-md border bg-background px-3 py-2"
+                    placeholder={field.placeholder}
+                    rows={4}
+                    onChange={(e) => handleInputChange(field.label, e.target.value)}
+                    required={field.required}
+                  />
+                ) : field.type === 'select' ? (
+                  <select
+                    className="w-full rounded-md border bg-background px-3 py-2"
+                    onChange={(e) => handleInputChange(field.label, e.target.value)}
+                    required={field.required}
+                  >
+                    <option value="">Select {field.label}</option>
+                    {field.options?.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <Input
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    min={field.min}
+                    max={field.max}
+                    step={field.step}
+                    defaultValue={field.defaultValue}
+                    onChange={(e) => handleInputChange(field.label, e.target.value)}
+                    required={field.required}
+                  />
+                )}
               </div>
-              {index < steps.length - 1 && (
-                <div className="mx-2 h-1 w-16 bg-muted" />
-              )}
+            ))}
+            <div className="flex justify-end space-x-4">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => router.back()}
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Creating...' : 'Create Agent'}
+              </Button>
             </div>
-          ))}
-        </div>
-        <div className="mt-4 flex justify-between px-2">
-          {steps.map((step, index) => (
-            <span
-              key={step.id}
-              className={`text-sm ${
-                index === 0 ? 'text-foreground' : 'text-muted-foreground'
-              }`}
-            >
-              {step.name}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Form Fields */}
-      <div className="rounded-lg border bg-card p-6">
-        <div className="space-y-6">
-          {steps[0].fields.map((field) => (
-            <div key={field.label} className="space-y-2">
-              <label className="text-sm font-medium">{field.label}</label>
-              {field.type === 'textarea' ? (
-                <textarea
-                  className="w-full rounded-md border bg-background px-3 py-2"
-                  placeholder={field.placeholder}
-                  rows={4}
-                />
-              ) : (
-                <input
-                  type={field.type}
-                  className="w-full rounded-md border bg-background px-3 py-2"
-                  placeholder={field.placeholder}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 flex justify-end space-x-4">
-          <Link
-            href="/agents"
-            className="rounded-lg border px-4 py-2 hover:bg-accent"
-          >
-            Cancel
-          </Link>
-          <button className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90">
-            Next Step
-            <ArrowRight className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 } 

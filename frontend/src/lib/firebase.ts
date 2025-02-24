@@ -6,16 +6,16 @@ import { getStorage } from 'firebase/storage';
 import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD-FKOVrc22alATy1LzgouWG6KLW2V2YWs",
-  authDomain: "ai-agent-generator-a05b0.firebaseapp.com",
-  projectId: "ai-agent-generator-a05b0",
-  storageBucket: "ai-agent-generator-a05b0.firebasestorage.app",
-  messagingSenderId: "408498574443",
-  appId: "1:408498574443:web:4017ca6bb7f13c900bcd2e",
-  measurementId: "G-BLGHNQCDX7"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase only if it hasn't been initialized
+// Initialize Firebase
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 // Initialize Firebase Authentication

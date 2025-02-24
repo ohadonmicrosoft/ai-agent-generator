@@ -12,14 +12,16 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "type-check": "tsc --noEmit",
     "validate": "npm run lint && npm run format:check && npm run type-check",
-    "clean": "rm -rf .next out node_modules"
+    "clean": "rm -rf .next out node_modules",
+    "deploy": "next build && firebase deploy --only hosting"
   },
   "dependencies": {
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",
     "autoprefixer": "^10.4.17",
-    "firebase": "^10.8.0",
+    "clsx": "^2.1.0",
+    "firebase": "9.23.0",
     "lucide-react": "^0.341.0",
     "next": "14.1.0",
     "next-auth": "^4.24.6",
@@ -28,6 +30,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
+    "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3"
   },

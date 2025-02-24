@@ -1,3 +1,7 @@
+'use client';
+
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
 import React from 'react';
 import {
   Bot,
@@ -67,122 +71,51 @@ const recentActivity = [
   },
 ];
 
-export default function DashboardPage() {
+export default function Dashboard() {
+  const { user } = useAuth();
+
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-4xl font-bold">Dashboard</h1>
-        <p className="text-xl text-muted-foreground">
-          Overview of your AI agents and system performance
-        </p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={stat.name}
-              className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="rounded-lg bg-primary/10 p-2">
-                  <Icon className="h-6 w-6 text-primary" />
-                </div>
-                <span
-                  className={`text-sm font-medium ${
-                    stat.change.startsWith('+')
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-red-600 dark:text-red-400'
-                  }`}
-                >
-                  {stat.change}
-                </span>
-              </div>
-              <div className="mt-4">
-                <h3 className="text-2xl font-bold">{stat.value}</h3>
-                <p className="text-sm text-muted-foreground">{stat.name}</p>
-              </div>
+    <ProtectedRoute>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+        
+        <div className="bg-card p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-semibold mb-4">Welcome, {user?.email}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Quick Actions */}
+            <div className="bg-background p-4 rounded-lg border border-border">
+              <h3 className="font-medium mb-2">Quick Actions</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href="/agents/new" className="text-primary hover:underline">
+                    Create New Agent
+                  </a>
+                </li>
+                <li>
+                  <a href="/prompts" className="text-primary hover:underline">
+                    Manage Prompts
+                  </a>
+                </li>
+              </ul>
             </div>
-          );
-        })}
-      </div>
 
-      {/* Main Content Grid */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Activity Feed */}
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Recent Activity</h2>
-            <button className="text-sm text-primary hover:underline">
-              View all
-            </button>
-          </div>
-          <div className="mt-6 space-y-6">
-            {recentActivity.map((activity) => {
-              const Icon = activity.icon;
-              return (
-                <div key={activity.id} className="flex gap-4">
-                  <div className="rounded-full bg-primary/10 p-2">
-                    <Icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{activity.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {activity.description}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {activity.timestamp}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+            {/* Recent Activity */}
+            <div className="bg-background p-4 rounded-lg border border-border">
+              <h3 className="font-medium mb-2">Recent Activity</h3>
+              <p className="text-muted-foreground">No recent activity</p>
+            </div>
 
-        {/* Performance Overview */}
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Performance Overview</h2>
-            <button className="rounded-lg p-2 hover:bg-accent">
-              <BarChart className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="mt-6">
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>Response Time</span>
-                  <span className="font-medium">0.8s</span>
-                </div>
-                <div className="mt-2 h-2 rounded-full bg-muted">
-                  <div className="h-full w-[85%] rounded-full bg-primary" />
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>Success Rate</span>
-                  <span className="font-medium">98.5%</span>
-                </div>
-                <div className="mt-2 h-2 rounded-full bg-muted">
-                  <div className="h-full w-[98.5%] rounded-full bg-green-500" />
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>Error Rate</span>
-                  <span className="font-medium">1.5%</span>
-                </div>
-                <div className="mt-2 h-2 rounded-full bg-muted">
-                  <div className="h-full w-[1.5%] rounded-full bg-red-500" />
-                </div>
+            {/* System Status */}
+            <div className="bg-background p-4 rounded-lg border border-border">
+              <h3 className="font-medium mb-2">System Status</h3>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span>All systems operational</span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 } 
