@@ -23,7 +23,7 @@ npm run lint
 
 # Building
 echo "🏗️ Building for production..."
-npm run build
+pnpm build
 
 # Deploy to Firebase
 echo "🚀 Deploying to Firebase..."

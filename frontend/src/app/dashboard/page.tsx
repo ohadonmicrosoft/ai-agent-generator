@@ -1,8 +1,8 @@
 'use client';
 
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { ProtectedRoute } from '@/components/auth/protected-route';
 import { useAuth } from '@/contexts/AuthContext';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Bot,
   MessageSquare,
@@ -12,6 +12,11 @@ import {
   Clock,
   BarChart,
 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LineChart } from '@/components/ui/charts/line-chart';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { ErrorMessage } from '@/components/ui/error-message';
+import { useRouter } from 'next/navigation';
 
 const stats = [
   {
@@ -71,49 +76,186 @@ const recentActivity = [
   },
 ];
 
+// Sample chart data - replace with real data fetching
+const chartData = {
+  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  datasets: [
+    {
+      label: 'Agent Usage',
+      data: [65, 59, 80, 81, 56, 55, 40],
+      fill: false,
+      borderColor: 'rgb(75, 192, 192)',
+      tension: 0.1,
+    },
+  ],
+};
+
 export default function Dashboard() {
   const { user } = useAuth();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [analyticsData, setAnalyticsData] = useState(chartData);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setAnalyticsData(chartData);
+        setIsLoading(false);
+      } catch (err) {
+        setError('Failed to load dashboard data');
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'create-agent':
+        router.push('/agents/create');
+        break;
+      case 'view-messages':
+        router.push('/messages');
+        break;
+      case 'analytics':
+        router.push('/analytics');
+        break;
+      case 'team-settings':
+        router.push('/settings/team');
+        break;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <ErrorMessage message={error} className="m-4" />;
+  }
 
   return (
     <ProtectedRoute>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+        <h1 className="mb-8 text-3xl font-bold">Dashboard</h1>
         
-        <div className="bg-card p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">Welcome, {user?.email}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Quick Actions */}
-            <div className="bg-background p-4 rounded-lg border border-border">
-              <h3 className="font-medium mb-2">Quick Actions</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="/agents/new" className="text-primary hover:underline">
-                    Create New Agent
-                  </a>
-                </li>
-                <li>
-                  <a href="/prompts" className="text-primary hover:underline">
-                    Manage Prompts
-                  </a>
-                </li>
-              </ul>
-            </div>
+        {/* Stats Grid */}
+        <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={stat.name}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {stat.name}
+                  </CardTitle>
+                  <Icon className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stat.change} from last month
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
 
-            {/* Recent Activity */}
-            <div className="bg-background p-4 rounded-lg border border-border">
-              <h3 className="font-medium mb-2">Recent Activity</h3>
-              <p className="text-muted-foreground">No recent activity</p>
-            </div>
-
-            {/* System Status */}
-            <div className="bg-background p-4 rounded-lg border border-border">
-              <h3 className="font-medium mb-2">System Status</h3>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <span>All systems operational</span>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          {/* Chart Section */}
+          <Card className="col-span-4">
+            <CardHeader>
+              <CardTitle>Analytics Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full">
+                <LineChart data={analyticsData} />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Activity */}
+          <Card className="col-span-3">
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentActivity.map((activity) => {
+                  const Icon = activity.icon;
+                  return (
+                    <div
+                      key={activity.id}
+                      className="flex items-center space-x-4"
+                    >
+                      <div className="rounded-full bg-background p-2">
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {activity.title}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {activity.description}
+                        </p>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {activity.timestamp}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <button
+                className="flex items-center space-x-2 rounded-lg border p-4 hover:bg-accent"
+                onClick={() => handleQuickAction('create-agent')}
+              >
+                <Bot className="h-5 w-5" />
+                <span>Create New Agent</span>
+              </button>
+              <button
+                className="flex items-center space-x-2 rounded-lg border p-4 hover:bg-accent"
+                onClick={() => handleQuickAction('view-messages')}
+              >
+                <MessageSquare className="h-5 w-5" />
+                <span>View Messages</span>
+              </button>
+              <button
+                className="flex items-center space-x-2 rounded-lg border p-4 hover:bg-accent"
+                onClick={() => handleQuickAction('analytics')}
+              >
+                <BarChart className="h-5 w-5" />
+                <span>Analytics</span>
+              </button>
+              <button
+                className="flex items-center space-x-2 rounded-lg border p-4 hover:bg-accent"
+                onClick={() => handleQuickAction('team-settings')}
+              >
+                <Users className="h-5 w-5" />
+                <span>Team Settings</span>
+              </button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </ProtectedRoute>

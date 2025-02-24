@@ -20,6 +20,10 @@ const nextConfig = {
     }
     return config;
   },
+  // Disable server-side features when exporting
+  experimental: {
+    appDir: true,
+  },
   // Other config options...
 }
 
