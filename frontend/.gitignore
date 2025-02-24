@@ -52,4 +52,19 @@ ui-debug.log*
 
 # Build artifacts
 dist/
-build/ 
+build/
+
+# pnpm specific
+.pnpm
+pnpm-lock.yaml
+.pnpm-store/
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock 
