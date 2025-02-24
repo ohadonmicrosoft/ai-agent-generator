@@ -43,8 +43,7 @@
   },
   "emulators": {
     "hosting": {
-      "port": 5000,
-      "startCommand": "npm run dev"
+      "port": 5000
     },
     "auth": {
       "port": 9099

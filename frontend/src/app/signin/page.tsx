@@ -18,8 +18,9 @@ export default function SignIn() {
     try {
       setError('');
       await signIn(email, password);
-    } catch (err) {
+    } catch (error) {
       setError('Failed to sign in');
+      console.error('Sign in error:', error);
     }
   };
 
@@ -27,8 +28,9 @@ export default function SignIn() {
     try {
       setError('');
       await signInWithGithub();
-    } catch (err) {
+    } catch (error) {
       setError('Failed to sign in with GitHub');
+      console.error('GitHub sign in error:', error);
     }
   };
 

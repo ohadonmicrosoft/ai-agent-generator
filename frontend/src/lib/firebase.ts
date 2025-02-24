@@ -3,7 +3,7 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
-import { getAnalytics, isSupported } from 'firebase/analytics';
+import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-FKOVrc22alATy1LzgouWG6KLW2V2YWs",
@@ -25,7 +25,7 @@ const auth = getAuth(app);
 const storage = getStorage(app);
 
 // Initialize Analytics only in production and browser environment
-let analytics: any = null;
+let analytics: Analytics | null = null;
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
   isSupported().then(yes => {
     if (yes) {
